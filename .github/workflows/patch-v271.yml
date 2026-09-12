@@ -1,0 +1,65 @@
+name: Patch Money Journal V2.7.1
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-v271.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix amount picking and readable names
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('v27.js')
+          s=p.read_text()
+
+          old="""  function chooseAmount(block){const nums=[...block.matchAll(/[-+]?\\d{1,3}(?:[.,]\\d{3})+(?:[.,]\\d{2})?|[-+]?\\d{4,}(?:[.,]\\d{2})?/g)].map(m=>({raw:m[0],n:parseMoney(m[0])})).filter(x=>Math.abs(x.n)>=1000&&Math.abs(x.n)<=200000000);if(!nums.length)return null;return nums[nums.length-1];}\n  function cleanName(block,dateRaw,amountRaw){let s=block.replace(dateRaw,' ').replace(amountRaw,' ').replace(/\\b(VND|VN\\/HANOI|VN\\/HCM|HO CHI MINH|HA NOI|Retail VNM|Primary VISA[^ ]*)\\b/gi,' ').replace(/\\s+/g,' ').trim();return s.slice(0,64)||'Giao dịch';}\n"""
+          new="""  function chooseAmount(block){
+    const nums=[...block.matchAll(/[-+]?\\d{1,3}(?:[.,]\\d{3})+(?:[.,]\\d{2})?|[-+]?\\d{4,}(?:[.,]\\d{2})?/g)].map((m,i)=>{const raw=m[0],n=parseMoney(raw),sep=/[.,]/.test(raw),dec=/[.,]\\d{2}$/.test(raw),signed=/^[+-]/.test(raw),plain=/^\\d{4,6}$/.test(raw);let score=0;if(sep)score+=6;if(dec)score+=3;if(signed)score+=2;if(Math.abs(n)>=10000)score+=2;if(plain)score-=5;if(/(?:^|\\D)(?:ref|auth|approval|trace|rrn|code)\\D{0,8}$/i.test(block.slice(Math.max(0,m.index-18),m.index)))score-=6;return {raw,n,score,i}}).filter(x=>Math.abs(x.n)>=1000&&Math.abs(x.n)<=200000000);
+    if(!nums.length)return null;
+    nums.sort((a,b)=>b.score-a.score||Math.abs(b.n)-Math.abs(a.n)||a.i-b.i);
+    return nums[0];
+  }
+  function cleanName(block,dateRaw,amountRaw){
+    const lower=block.toLowerCase();
+    if(/cash withdrawal/.test(lower))return'Rút tiền mặt';
+    if(/credit account|payment received|thanh toán dư nợ|thanh toan du no/.test(lower))return'Thanh toán thẻ';
+    if(/cash installment|vpb_installment|idt:/.test(lower))return'Trả góp VPBank';
+    if(/grab/.test(lower))return'Grab';
+    if(/shopee/.test(lower))return'Shopee';
+    let s=block.replace(dateRaw,' ').replace(/\\b\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4}\\b/g,' ').replace(/[-+]?\\d{1,3}(?:[.,]\\d{3})+(?:[.,]\\d{2})?|[-+]?\\d{4,}(?:[.,]\\d{2})?/g,' ').replace(/\\b(VND|VN\\/HANOI|VN\\/HCM|HO CHI MINH|HA NOI|Retail VNM|Primary VISA[^ ]*)\\b/gi,' ').replace(/[_|]+/g,' ').replace(/\\s+/g,' ').replace(/^[^A-Za-zÀ-ỹ]+|[^A-Za-zÀ-ỹ0-9]+$/g,'').trim();
+    return s.slice(0,52);
+  }
+"""
+          if old not in s:
+              raise SystemExit('target amount/name functions not found')
+          s=s.replace(old,new)
+
+          old2="""const name=cleanName(block,d.raw,amt.raw);if(name.length<3)continue;let type=typeFor(block),category=categoryFor(block);"""
+          new2="""const name=cleanName(block,d.raw,amt.raw);if(name.length<3||!/[A-Za-zÀ-ỹ]/.test(name))continue;let type=typeFor(block),category=categoryFor(block);"""
+          if old2 not in s:
+              raise SystemExit('target parseBank segment not found')
+          s=s.replace(old2,new2)
+
+          # make the review list human-first; raw OCR jargon is no longer the title
+          s=s.replace("<small>${r.date}</small>","<small>${r.date} · ${TYPE_LABELS[r.type]||'Giao dịch'}</small>")
+          p.write_text(s)
+
+          p=Path('sw.js'); sw=p.read_text();
+          sw=sw.replace("money-journal-v2-2.7.0-2026-09-12","money-journal-v2-2.7.1-2026-09-12").replace('?v=270','?v=271')
+          p.write_text(sw)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v27.js sw.js
+          git commit -m 'Fix false amount codes and clean transaction names [skip ci]' || exit 0
+          git push
