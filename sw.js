@@ -1,5 +1,5 @@
-const CACHE = 'money-journal-v2-3.1.0-2026-09-12';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v21.js', './v22.css', './v22.js', './v25.css', './v25.js', './v27.js', './v28.js', './v29.js', './v31.css', './v31.js'];
+const CACHE = 'money-journal-v2-3.2.0-2026-09-12';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v21.js', './v22.css', './v22.js', './v25.css', './v25.js', './v27.js', './v28.js', './v29.js', './v31.css', './v31.js', './v32.css', './v32.js'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
@@ -15,17 +15,19 @@ async function enhanceHtml(response) {
   const type = response.headers.get('content-type') || '';
   if (!type.includes('text/html')) return response;
   let html = await response.text();
-  if (!html.includes('v21.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v21.css?v=310"></head>');
-  if (!html.includes('v22.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v22.css?v=310"></head>');
-  if (!html.includes('v25.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v25.css?v=310"></head>');
-  if (!html.includes('v31.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v31.css?v=310"></head>');
-  if (!html.includes('v21.js')) html = html.replace('</body>', '<script src="./v21.js?v=310" defer></script></body>');
-  if (!html.includes('v22.js')) html = html.replace('</body>', '<script src="./v22.js?v=310" defer></script></body>');
-  if (!html.includes('v25.js')) html = html.replace('</body>', '<script src="./v25.js?v=310" defer></script></body>');
-  if (!html.includes('v27.js')) html = html.replace('</body>', '<script src="./v27.js?v=310" defer></script></body>');
-  if (!html.includes('v28.js')) html = html.replace('</body>', '<script src="./v28.js?v=310" defer></script></body>');
-  if (!html.includes('v29.js')) html = html.replace('</body>', '<script src="./v29.js?v=310" defer></script></body>');
-  if (!html.includes('v31.js')) html = html.replace('</body>', '<script src="./v31.js?v=310" defer></script></body>');
+  if (!html.includes('v21.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v21.css?v=320"></head>');
+  if (!html.includes('v22.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v22.css?v=320"></head>');
+  if (!html.includes('v25.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v25.css?v=320"></head>');
+  if (!html.includes('v31.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v31.css?v=320"></head>');
+  if (!html.includes('v32.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v32.css?v=320"></head>');
+  if (!html.includes('v21.js')) html = html.replace('</body>', '<script src="./v21.js?v=320" defer></script></body>');
+  if (!html.includes('v22.js')) html = html.replace('</body>', '<script src="./v22.js?v=320" defer></script></body>');
+  if (!html.includes('v25.js')) html = html.replace('</body>', '<script src="./v25.js?v=320" defer></script></body>');
+  if (!html.includes('v27.js')) html = html.replace('</body>', '<script src="./v27.js?v=320" defer></script></body>');
+  if (!html.includes('v28.js')) html = html.replace('</body>', '<script src="./v28.js?v=320" defer></script></body>');
+  if (!html.includes('v29.js')) html = html.replace('</body>', '<script src="./v29.js?v=320" defer></script></body>');
+  if (!html.includes('v31.js')) html = html.replace('</body>', '<script src="./v31.js?v=320" defer></script></body>');
+  if (!html.includes('v32.js')) html = html.replace('</body>', '<script src="./v32.js?v=320" defer></script></body>');
   const headers = new Headers(response.headers);
   headers.set('content-type', 'text/html; charset=utf-8');
   headers.set('cache-control', 'no-store');
