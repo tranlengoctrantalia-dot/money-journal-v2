@@ -1,4 +1,4 @@
-const CACHE = 'money-journal-v2-2.2-2026-09-12';
+const CACHE = 'money-journal-v2-2.3.0-2026-09-12';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v21.js', './v22.css', './v22.js'];
 
 self.addEventListener('install', event => {
