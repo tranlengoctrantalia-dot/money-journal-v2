@@ -1,5 +1,5 @@
-const CACHE = 'money-journal-v2-3.9.0-2026-09-12';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v21.js', './v22.css', './v22.js', './v25.css', './v25.js', './v27.js', './v28.js', './v29.js', './v31.css', './v31.js', './v32.css', './v32.js', './v33.js', './v34-import.js', './v35.css', './v36.css', './v36.js', './v37.css', './v37-ui.js', './v38-analytics.css', './v38-analytics.js', './v39-theme.css', './v39-theme.js'];
+const CACHE = 'money-journal-v2-4.0.0-2026-09-12';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v21.js', './v22.css', './v22.js', './v25.css', './v25.js', './v27.js', './v28.js', './v29.js', './v31.css', './v31.js', './v32.css', './v32.js', './v33.js', './v34-import.js', './v35.css', './v36.css', './v36.js', './v37.css', './v37-ui.js', './v38-analytics.css', './v38-analytics.js', './v39-theme.css', './v39-theme.js', './v40-activity.css', './v40-activity.js'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
@@ -16,30 +16,10 @@ async function enhanceHtml(response) {
   if (!type.includes('text/html')) return response;
   let html = await response.text();
   if (!html.includes('mj_theme_mode')) html = html.replace('<head>', '<head><script>(function(){try{var t=localStorage.getItem("mj_theme_mode")==="dark"?"dark":"light";document.documentElement.setAttribute("data-theme",t);document.documentElement.style.colorScheme=t}catch(e){}})();</script>');
-  if (!html.includes('v21.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v21.css?v=390"></head>');
-  if (!html.includes('v22.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v22.css?v=390"></head>');
-  if (!html.includes('v25.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v25.css?v=390"></head>');
-  if (!html.includes('v31.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v31.css?v=390"></head>');
-  if (!html.includes('v32.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v32.css?v=390"></head>');
-  if (!html.includes('v35.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v35.css?v=390"></head>');
-  if (!html.includes('v36.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v36.css?v=390"></head>');
-  if (!html.includes('v37.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v37.css?v=390"></head>');
-  if (!html.includes('v38-analytics.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v38-analytics.css?v=390"></head>');
-  if (!html.includes('v39-theme.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v39-theme.css?v=390"></head>');
-  if (!html.includes('v21.js')) html = html.replace('</body>', '<script src="./v21.js?v=390" defer></script></body>');
-  if (!html.includes('v22.js')) html = html.replace('</body>', '<script src="./v22.js?v=390" defer></script></body>');
-  if (!html.includes('v25.js')) html = html.replace('</body>', '<script src="./v25.js?v=390" defer></script></body>');
-  if (!html.includes('v27.js')) html = html.replace('</body>', '<script src="./v27.js?v=390" defer></script></body>');
-  if (!html.includes('v28.js')) html = html.replace('</body>', '<script src="./v28.js?v=390" defer></script></body>');
-  if (!html.includes('v29.js')) html = html.replace('</body>', '<script src="./v29.js?v=390" defer></script></body>');
-  if (!html.includes('v31.js')) html = html.replace('</body>', '<script src="./v31.js?v=390" defer></script></body>');
-  if (!html.includes('v32.js')) html = html.replace('</body>', '<script src="./v32.js?v=390" defer></script></body>');
-  if (!html.includes('v33.js')) html = html.replace('</body>', '<script src="./v33.js?v=390" defer></script></body>');
-  if (!html.includes('v34-import.js')) html = html.replace('</body>', '<script src="./v34-import.js?v=390" defer></script></body>');
-  if (!html.includes('v36.js')) html = html.replace('</body>', '<script src="./v36.js?v=390" defer></script></body>');
-  if (!html.includes('v37-ui.js')) html = html.replace('</body>', '<script src="./v37-ui.js?v=390" defer></script></body>');
-  if (!html.includes('v38-analytics.js')) html = html.replace('</body>', '<script src="./v38-analytics.js?v=390" defer></script></body>');
-  if (!html.includes('v39-theme.js')) html = html.replace('</body>', '<script src="./v39-theme.js?v=390" defer></script></body>');
+  const css=['v21.css','v22.css','v25.css','v31.css','v32.css','v35.css','v36.css','v37.css','v38-analytics.css','v39-theme.css','v40-activity.css'];
+  css.forEach(f=>{if(!html.includes(f)) html=html.replace('</head>', `<link rel="stylesheet" href="./${f}?v=400"></head>`)});
+  const js=['v21.js','v22.js','v25.js','v27.js','v28.js','v29.js','v31.js','v32.js','v33.js','v34-import.js','v36.js','v37-ui.js','v38-analytics.js','v39-theme.js','v40-activity.js'];
+  js.forEach(f=>{if(!html.includes(f)) html=html.replace('</body>', `<script src="./${f}?v=400" defer></script></body>`)});
   const headers = new Headers(response.headers);
   headers.set('content-type', 'text/html; charset=utf-8');
   headers.set('cache-control', 'no-store');
