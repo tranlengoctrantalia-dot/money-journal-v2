@@ -1,0 +1,47 @@
+name: Patch Money Journal V2.1.2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-v212.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fix iPhone existing-photo picker
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('v21.js')
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'\s+capture=\\?"environment\\?"', '', s)
+          s = s.replace('🖼️ Chọn ảnh / PDF', '🖼️ Ảnh có sẵn / PDF')
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('sw.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('money-journal-v2-2.1.1-2026-09-12', 'money-journal-v2-2.1.2-2026-09-12')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v21.js sw.js
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Allow existing photos on iPhone statement import [skip ci]"
+            git push
+          fi
