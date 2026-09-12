@@ -1,0 +1,61 @@
+name: Patch Money Journal V2.1.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-v211.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch app entrypoint and photo picker
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # Load V2.1 directly from index.html so iOS/PWA does not depend on
+          # service-worker HTML injection before the feature becomes visible.
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          if 'v21.css' not in s:
+              s = s.replace('</head>', '<link rel="stylesheet" href="./v21.css?v=211"></head>')
+          if 'v21.js' not in s:
+              s = s.replace('</body>', '<script src="./v21.js?v=211" defer></script></body>')
+          p.write_text(s, encoding='utf-8')
+
+          # On iPhone, capture="environment" forces the camera. Remove it so
+          # the user can pick an existing photo/PDF from Photos or Files.
+          p = Path('v21.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(' capture=\\"environment\\"', '')
+          s = s.replace('Chụp / chọn sao kê', '🖼️ Chọn ảnh / PDF')
+          p.write_text(s, encoding='utf-8')
+
+          # Bust the PWA cache so installed Home Screen copies receive this fix.
+          p = Path('sw.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("money-journal-v2-2.1-2026-09-12", "money-journal-v2-2.1.1-2026-09-12")
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html v21.js sw.js
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Fix iPhone photo picker and load V2.1 directly [skip ci]"
+            git push
+          fi
