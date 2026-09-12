@@ -1,0 +1,31 @@
+name: Patch Money Journal V2.2
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-v22.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject V2.2 assets into index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          if 'v22.css' not in s:
+              s=s.replace('</head>','<link rel="stylesheet" href="./v22.css?v=220"></head>')
+          if 'v22.js' not in s:
+              s=s.replace('</body>','<script src="./v22.js?v=220" defer></script></body>')
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Load V2.2 simple UI directly [skip ci]'
+          git push
