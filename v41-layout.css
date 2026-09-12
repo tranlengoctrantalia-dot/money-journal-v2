@@ -1,0 +1,47 @@
+/* V4.1 — information architecture + consistent Moonlit UI */
+:root{--v41-panel:var(--mj-surface,#fffdf8);--v41-line:var(--mj-line,#eadfce);--v41-text:var(--mj-text,#171827);--v41-muted:var(--mj-muted,#777484);--v41-gold:var(--mj-gold,#e7b84e);--v41-soft:rgba(231,184,78,.12)}
+
+/* Home: keep it focused, analytics lives in its own tab */
+#home #v38Categories{display:none!important}
+
+/* Bottom navigation: labels first, no decorative icon clutter */
+.bottom{grid-template-columns:1fr 1fr .92fr 1fr 1fr!important;padding:7px 8px!important;height:68px!important;align-items:center!important}
+.nav{font-size:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;min-width:0!important}
+.nav small{font-size:10px!important;line-height:1.1!important;margin:0!important;font-weight:750!important;letter-spacing:-.01em!important;white-space:nowrap!important}
+.nav[data-tab="scan"]{position:relative!important}
+.nav[data-tab="scan"] .fab{width:46px!important;height:46px!important;border-radius:15px!important;font-size:25px!important;margin-top:-18px!important;box-shadow:0 10px 24px rgba(231,184,78,.28)!important}
+.nav[data-tab="scan"] small{margin-top:-1px!important}
+
+/* Analytics tab */
+#activity>.section:first-child{margin-top:10px!important;margin-bottom:12px!important}
+#activity>.section:first-child>span:first-child{font-size:24px!important;font-weight:900!important;letter-spacing:-.04em!important}
+#activity>.section:first-child .link{display:none!important}
+#activity #filters{margin-bottom:12px!important;gap:7px!important;scrollbar-width:none}
+#activity #filters::-webkit-scrollbar{display:none}
+#activity #filters .tool{font-size:10px!important;padding:8px 11px!important}
+#activity #search{margin-bottom:14px!important;min-height:46px!important;border-radius:14px!important;padding:0 14px!important}
+#activityList{border-radius:20px!important;overflow:hidden!important;padding:0!important}
+
+/* Category statistics: remove emoji badges, use typography + bars */
+.v40-card{background:var(--v41-panel)!important;border:1px solid var(--v41-line)!important;border-radius:22px!important;padding:18px!important;box-shadow:none!important;color:var(--v41-text)!important}
+.v40-head{display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:12px!important;margin-bottom:14px!important}
+.v40-head small{display:block!important;color:var(--v41-muted)!important;font-size:10px!important;font-weight:800!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+.v40-head h3{font-size:21px!important;line-height:1.05!important;margin:4px 0 0!important;letter-spacing:-.04em!important;color:var(--v41-text)!important}
+.v40-total{text-align:right!important;min-width:110px!important}.v40-total span{display:block!important;color:var(--v41-muted)!important;font-size:10px!important}.v40-total strong{display:block!important;margin-top:3px!important;font-size:16px!important;color:var(--v41-text)!important}
+.v40-months{display:flex!important;gap:6px!important;overflow:auto!important;margin:0 -2px 14px!important;padding:2px!important;scrollbar-width:none}.v40-months::-webkit-scrollbar{display:none}.v40-months button{border:1px solid var(--v41-line)!important;background:transparent!important;color:var(--v41-muted)!important;border-radius:999px!important;padding:7px 10px!important;font-size:10px!important;font-weight:750!important;white-space:nowrap!important}.v40-months button.active{background:var(--v41-gold)!important;color:#17120a!important;border-color:transparent!important}
+.v40-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:14px!important;align-items:center!important;width:100%!important;padding:13px 0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--v41-line)!important;text-align:left!important;color:inherit!important}.v40-row:last-child{border-bottom:0!important}.v40-icon{display:none!important}.v40-mid{min-width:0!important}.v40-label{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important;margin-bottom:7px!important}.v40-label b{font-size:13px!important;color:var(--v41-text)!important;font-weight:800!important}.v40-label em{font-size:10px!important;color:var(--v41-muted)!important;font-style:normal!important}.v40-track{height:5px!important;border-radius:999px!important;background:rgba(125,128,145,.15)!important;overflow:hidden!important}.v40-track i{display:block!important;height:100%!important;border-radius:999px!important;background:linear-gradient(90deg,#c8942f,var(--v41-gold))!important}.v40-amt{font-size:13px!important;font-weight:850!important;color:var(--v41-text)!important;white-space:nowrap!important}.v40-empty{padding:22px 4px!important;color:var(--v41-muted)!important;font-size:12px!important;text-align:center!important}
+
+/* Transaction history: no decorative category icons */
+.v36-tx{grid-template-columns:minmax(0,1fr) auto 10px!important;padding:14px 15px!important;background:transparent!important;border-color:var(--v41-line)!important}.v36-tx-icon{display:none!important}.v36-tx-main strong,.v36-tx-right strong{color:var(--v41-text)!important}.v36-tx-main small,.v36-tx-right small{color:var(--v41-muted)!important}.v36-chevron{color:var(--v41-muted)!important;font-size:17px!important}.v36-tx:active{background:var(--v41-soft)!important}
+
+/* Recent on home gets the same system */
+#recent{padding:0!important;overflow:hidden!important;border-radius:20px!important}
+#recent .v36-tx{background:transparent!important}
+
+/* Light/dark contrast consistency */
+html[data-theme="dark"] .v40-card,html[data-theme="dark"] #activityList,html[data-theme="dark"] #recent{background:var(--mj-surface)!important;border-color:var(--mj-line)!important;color:var(--mj-text)!important}
+html[data-theme="dark"] .v40-track{background:#222c44!important}
+html[data-theme="dark"] .v36-tx{background:transparent!important}
+html[data-theme="dark"] .v40-label b,html[data-theme="dark"] .v40-amt,html[data-theme="dark"] .v40-total strong{color:var(--mj-text)!important}
+
+@media(max-width:380px){.bottom{padding-inline:5px!important}.nav small{font-size:9px!important}.v40-card{padding:15px!important}.v40-head h3{font-size:19px!important}}
