@@ -1,0 +1,53 @@
+/* V3.9 — persistent Moonlit dark mode */
+:root{color-scheme:light;--mj-bg:#fff8ec;--mj-surface:#fffdf8;--mj-surface-2:#f7f1e7;--mj-text:#171827;--mj-muted:#777484;--mj-line:#eadfce;--mj-navy:#101735;--mj-gold:#e7b84e;--mj-coral:#d96858;--mj-shadow:0 14px 36px rgba(61,43,17,.09)}
+html[data-theme="dark"]{color-scheme:dark;--mj-bg:#080d1d;--mj-surface:#10172b;--mj-surface-2:#151e35;--mj-text:#f7f2e8;--mj-muted:#9ca6ba;--mj-line:#25304a;--mj-navy:#080d1d;--mj-gold:#f0c96b;--mj-coral:#ff806c;--mj-shadow:0 18px 46px rgba(0,0,0,.28)}
+html[data-theme="dark"],html[data-theme="dark"] body{background:radial-gradient(circle at 85% 0%,rgba(240,201,107,.07),transparent 26%),linear-gradient(180deg,#080d1d,#0b1122 45%,#0d1324)!important;color:var(--mj-text)!important}
+html[data-theme="dark"] .app{color:var(--mj-text)}
+
+/* Toggle */
+.mj-theme-toggle{appearance:none;border:1px solid var(--mj-line);background:var(--mj-surface);color:var(--mj-text);width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:17px;line-height:1;box-shadow:var(--mj-shadow);cursor:pointer;transition:transform .2s ease,background .2s ease,border-color .2s ease}
+.mj-theme-toggle:active{transform:scale(.94)}
+.top{gap:10px}.top .chip{margin-left:auto}
+html[data-theme="dark"] .chip{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.1)!important;color:#d8cfbd!important}
+
+/* General surfaces */
+html[data-theme="dark"] .section,html[data-theme="dark"] .brand,html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3{color:var(--mj-text)!important}
+html[data-theme="dark"] .card,html[data-theme="dark"] .v36-account,html[data-theme="dark"] .v37-insight,html[data-theme="dark"] .v38-panel,html[data-theme="dark"] .v38-category-card,html[data-theme="dark"] .scan,html[data-theme="dark"] .v31-card,html[data-theme="dark"] .v32-card{background:var(--mj-surface)!important;border-color:var(--mj-line)!important;color:var(--mj-text)!important;box-shadow:var(--mj-shadow)!important}
+html[data-theme="dark"] .kicker,html[data-theme="dark"] .meta,html[data-theme="dark"] .notice,html[data-theme="dark"] .link,html[data-theme="dark"] .v36-kicker,html[data-theme="dark"] small{color:var(--mj-muted)!important}
+html[data-theme="dark"] .txn,html[data-theme="dark"] .v36-tx{border-color:var(--mj-line)!important}
+html[data-theme="dark"] .ico,html[data-theme="dark"] .v36-tx-icon{background:var(--mj-surface-2)!important;color:var(--mj-gold)!important}
+html[data-theme="dark"] .name,html[data-theme="dark"] .amt,html[data-theme="dark"] .v36-tx strong,html[data-theme="dark"] .v38-category-name,html[data-theme="dark"] .v38-category-amount{color:var(--mj-text)!important}
+html[data-theme="dark"] .pill,html[data-theme="dark"] .tool{background:var(--mj-surface-2)!important;border-color:var(--mj-line)!important;color:var(--mj-muted)!important}
+html[data-theme="dark"] .tool.active{background:var(--mj-gold)!important;color:#17120a!important;border-color:transparent!important}
+html[data-theme="dark"] .progress,html[data-theme="dark"] .v38-track{background:#222c44!important}
+html[data-theme="dark"] .progress i,html[data-theme="dark"] .v38-track i{background:linear-gradient(90deg,#c89132,var(--mj-gold))!important}
+
+/* Hero keeps the Mid-Autumn night identity in both modes */
+html[data-theme="dark"] .hero{background:linear-gradient(145deg,#080c1e 0%,#111b3d 58%,#1d2d5d 100%)!important;border:1px solid rgba(240,201,107,.12)!important;box-shadow:0 22px 55px rgba(0,0,0,.34)!important}
+html[data-theme="dark"] .mini{background:rgba(255,255,255,.055)!important;border-color:rgba(255,255,255,.07)!important}
+html[data-theme="dark"] .v37-moon{filter:drop-shadow(0 0 28px rgba(240,201,107,.3))}
+
+/* Inputs / sheets */
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea,html[data-theme="dark"] .v31-field input,html[data-theme="dark"] .v31-field select,html[data-theme="dark"] .v32-field input,html[data-theme="dark"] .v32-field select{background:#0d1428!important;color:var(--mj-text)!important;border-color:var(--mj-line)!important}
+html[data-theme="dark"] input::placeholder,html[data-theme="dark"] textarea::placeholder{color:#6f7890!important}
+html[data-theme="dark"] .sheet,html[data-theme="dark"] .v36-sheet{background:#10172b!important;color:var(--mj-text)!important;border-top:1px solid var(--mj-line)!important}
+html[data-theme="dark"] .v36-icon-btn,html[data-theme="dark"] .btn.alt,html[data-theme="dark"] .v36-text-btn{background:var(--mj-surface-2)!important;color:var(--mj-text)!important;border-color:var(--mj-line)!important}
+html[data-theme="dark"] .v36-save,html[data-theme="dark"] .btn,html[data-theme="dark"] .scan-v25-save{background:var(--mj-gold)!important;color:#17120a!important}
+
+/* Scan */
+html[data-theme="dark"] .scan-v25-icon,html[data-theme="dark"] .scan-v25-progress{background:var(--mj-surface-2)!important;border-color:var(--mj-line)!important}
+html[data-theme="dark"] .scan-v25-btn{background:var(--mj-surface-2)!important;color:var(--mj-text)!important;border-color:var(--mj-line)!important}
+html[data-theme="dark"] .scan-v25-btn.primary{background:var(--mj-gold)!important;color:#17120a!important}
+
+/* Floating nav */
+html[data-theme="dark"] .bottom{background:rgba(12,18,34,.9)!important;border-color:#27314a!important;box-shadow:0 18px 45px rgba(0,0,0,.42)!important;backdrop-filter:blur(24px)}
+html[data-theme="dark"] .nav{color:#7f899f!important}html[data-theme="dark"] .nav.active{color:var(--mj-gold)!important}
+html[data-theme="dark"] .fab{background:linear-gradient(145deg,#d5a43d,#f0c96b)!important;color:#17120a!important}
+
+/* Analytics */
+html[data-theme="dark"] .v38-category-row{border-color:var(--mj-line)!important}
+html[data-theme="dark"] .v38-segmented{background:var(--mj-surface-2)!important;border-color:var(--mj-line)!important}
+html[data-theme="dark"] .v38-segmented button{color:var(--mj-muted)!important}
+html[data-theme="dark"] .v38-segmented button.active{background:var(--mj-gold)!important;color:#17120a!important}
+
+@media(prefers-reduced-motion:reduce){.mj-theme-toggle{transition:none}}
