@@ -1,0 +1,184 @@
+name: Patch Money Journal V2.4
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-v24.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch scan UX and batch flow
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # --- v21.js: expose OCR rows for batch collector ---
+          p = Path('v21.js')
+          s = p.read_text()
+          bridge = "\n  window.__getOcrRows = () => ocrRows;\n  window.__setOcrRows = rows => { ocrRows = Array.isArray(rows) ? rows : []; };\n"
+          if '__getOcrRows' not in s:
+              marker = "  window.scanStatement = async function(file){"
+              s = s.replace(marker, bridge + "\n" + marker)
+          p.write_text(s)
+
+          # --- v22.js: simplify UI and make progress visible ---
+          p = Path('v22.js')
+          s = p.read_text()
+
+          s = re.sub(
+              r"  function getRows\(\)\{.*?  \}\n  function setRows\(rows\)\{.*?  \}\n",
+              "  function getRows(){\n    if(typeof window.__getOcrRows==='function') return window.__getOcrRows() || [];\n    try { if (typeof ocrRows !== 'undefined') return ocrRows; } catch(e) {}\n    return window.ocrRows || [];\n  }\n  function setRows(rows){\n    if(typeof window.__setOcrRows==='function'){ window.__setOcrRows(rows); return; }\n    try { if (typeof ocrRows !== 'undefined') { ocrRows = rows; return; } } catch(e) {}\n    window.ocrRows = rows;\n  }\n",
+              s, count=1, flags=re.S
+          )
+
+          new_scan = r'''    scan.innerHTML = `
+      <div class="scan-hero-icon">🧾</div>
+      <div class="simple-scan-title">Quét sao kê</div>
+      <div class="simple-scan-sub">Chọn ảnh. App sẽ tự đọc và tạo giao dịch.</div>
+      <input id="statementPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
+      <input id="statementPdf" type="file" accept="application/pdf" hidden>
+      <input id="statementFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" hidden>
+      <select id="statementSource" hidden><option value="auto" selected>Tự nhận diện</option><option value="vpbank">VPBank</option><option value="shinhan">Shinhan</option><option value="paylater">Ví Trả Sau</option><option value="other">Khác</option></select>
+      <input id="statementAccount" hidden>
+      <div class="scan-actions">
+        <button class="scan-action primary" id="pickPhotoBtn"><span class="scan-action-icon">🖼️</span><span><b>Chọn ảnh</b><small>Tối đa 10 ảnh</small></span></button>
+        <button class="scan-action" id="pickPdfBtn"><span class="scan-action-icon">📄</span><span><b>Chọn PDF</b><small>1 file</small></span></button>
+      </div>
+      <div id="scanProgress" class="scan-progress-card" hidden>
+        <div class="scan-progress-top">
+          <span id="scanSpinner" class="scan-spinner"></span>
+          <div><b id="scanProgressTitle">Đang quét…</b><small id="scanProgressSub">Vui lòng giữ app mở</small></div>
+          <span id="scanProgressCount" class="scan-count"></span>
+        </div>
+        <div class="scan-progress-track"><i id="scanProgressBar"></i></div>
+      </div>
+      <div id="photoCount" class="file-count"></div>`;'''
+          s = re.sub(r"    scan\.innerHTML = `.*?</details>`;", new_scan, s, count=1, flags=re.S)
+
+          # Remove handlers for controls that no longer exist
+          s = re.sub(r"\n    byId\('statementSourceVisible'\).*?;\n    byId\('statementAccountVisible'\).*?;", "", s, count=1, flags=re.S)
+
+          # Replace photo/pdf handlers with explicit visible state
+          s = re.sub(
+              r"    photo\.onchange = async \(\) => \{.*?    \};\n    pdf\.onchange = async \(\) => \{.*?    \};",
+              r'''    photo.onchange = async () => {
+      const selected = Array.from(photo.files || []);
+      const files = selected.slice(0,10);
+      const count=byId('photoCount');
+      if(count) count.textContent = selected.length > 10 ? `Đã chọn 10 ảnh · bỏ qua ${selected.length-10} ảnh` : files.length ? `Đã chọn ${files.length} ảnh` : '';
+      if(files.length) await scanStatementBatch(files);
+      photo.value='';
+    };
+    pdf.onchange = async () => {
+      const file=pdf.files?.[0];
+      if(file){
+        showScanProgress(0,1,'Đang đọc PDF…','Có thể mất một lúc');
+        try{
+          if(typeof window.scanStatement==='function') await window.scanStatement(file);
+          finishScanProgress('Đã đọc PDF');
+        }catch(e){ failScanProgress('Không đọc được PDF'); }
+      }
+      pdf.value='';
+    };''',
+              s, count=1, flags=re.S
+          )
+
+          helper = r'''
+  function showScanProgress(done,total,title,sub){
+    const box=byId('scanProgress'); if(!box) return;
+    box.hidden=false; box.classList.remove('done','error'); box.classList.add('busy');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub'), c=byId('scanProgressCount'), b=byId('scanProgressBar');
+    if(t) t.textContent=title||'Đang quét…';
+    if(st) st.textContent=sub||'Vui lòng giữ app mở';
+    if(c) c.textContent=total?`${Math.min(done,total)}/${total}`:'';
+    if(b) b.style.width=(total?Math.max(6,Math.round(done/total*100)):8)+'%';
+  }
+  function finishScanProgress(text){
+    const box=byId('scanProgress'); if(!box) return;
+    box.classList.remove('busy','error'); box.classList.add('done');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub'), b=byId('scanProgressBar');
+    if(t) t.textContent=text||'Quét xong'; if(st) st.textContent='Kiểm tra giao dịch bên dưới'; if(b) b.style.width='100%';
+  }
+  function failScanProgress(text){
+    const box=byId('scanProgress'); if(!box) return;
+    box.classList.remove('busy','done'); box.classList.add('error');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub'); if(t) t.textContent=text||'Có lỗi'; if(st) st.textContent='Thử lại với ảnh rõ hơn';
+  }
+'''
+          if 'function showScanProgress' not in s:
+              s = s.replace("  async function scanStatementBatch(files){", helper + "\n  async function scanStatementBatch(files){")
+
+          # Replace batch loop/status to keep progress visible beside buttons
+          s = re.sub(
+              r"  async function scanStatementBatch\(files\)\{.*?  \}\n  window\.scanStatementBatch = scanStatementBatch;",
+              r'''  async function scanStatementBatch(files){
+    if(typeof window.scanStatement !== 'function') { failScanProgress('Chưa sẵn sàng để quét'); return; }
+    const all=[]; const seen=new Set(); const status=byId('ocrStatus');
+    const photoBtn=byId('pickPhotoBtn'), pdfBtn=byId('pickPdfBtn');
+    if(photoBtn) photoBtn.disabled=true; if(pdfBtn) pdfBtn.disabled=true;
+    showScanProgress(0,files.length,`Đang quét ${files.length} ảnh…`,'Ảnh đầu tiên thường chậm hơn');
+    try{
+      for(let i=0;i<files.length;i++){
+        showScanProgress(i,files.length,`Đang quét ảnh ${i+1}/${files.length}`,'Đang nhận diện giao dịch');
+        if(status) status.textContent=`Đang quét ảnh ${i+1}/${files.length}…`;
+        await window.scanStatement(files[i]);
+        const rows=(getRows()||[]).map(r=>({...r}));
+        for(const r of rows){ const k=rowKey(r); if(seen.has(k)) continue; seen.add(k); all.push(r); }
+        showScanProgress(i+1,files.length, i+1===files.length?'Đang hoàn tất…':`Đã xong ảnh ${i+1}/${files.length}`,'Tiếp tục tự động');
+      }
+      setRows(all);
+      if(typeof window.renderCandidates==='function') window.renderCandidates();
+      if(typeof window.updateReviewSummary==='function') window.updateReviewSummary();
+      if(byId('reviewTools')) byId('reviewTools').style.display=all.length?'flex':'none';
+      if(byId('reviewSummary')) byId('reviewSummary').style.display=all.length?'grid':'none';
+      if(byId('saveCandidatesWrap')) byId('saveCandidatesWrap').style.display=all.length?'block':'none';
+      if(status) status.textContent=all.length?`Tìm thấy ${all.length} giao dịch.`:'Không tìm thấy giao dịch.';
+      finishScanProgress(all.length?`Xong · ${all.length} giao dịch`:'Không tìm thấy giao dịch');
+    }catch(e){ console.error(e); failScanProgress('Quét bị gián đoạn'); if(status) status.textContent='Quét bị gián đoạn. Thử lại.'; }
+    finally{ if(photoBtn) photoBtn.disabled=false; if(pdfBtn) pdfBtn.disabled=false; }
+  }
+  window.scanStatementBatch = scanStatementBatch;''',
+              s, count=1, flags=re.S
+          )
+          p.write_text(s)
+
+          # --- v22.css: cleaner finance-app style + progress ---
+          p = Path('v22.css')
+          css = p.read_text()
+          extra = r'''
+.v22-simple .scan{padding:22px 16px;text-align:left;background:#fffdf8;border:1px solid var(--line);box-shadow:0 10px 28px rgba(30,32,60,.07)}
+.v22-simple .scan-hero-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#f6f1e7;font-size:21px;margin-bottom:12px}
+.v22-simple .simple-scan-title{font-size:20px;letter-spacing:-.3px}
+.v22-simple .simple-scan-sub{font-size:12px;margin:5px 0 16px;line-height:1.45}
+.v22-simple .scan-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.v22-simple .scan-action{appearance:none;border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;text-align:left;display:flex;align-items:center;gap:10px;color:var(--ink);min-height:74px}
+.v22-simple .scan-action.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.v22-simple .scan-action:disabled{opacity:.55}
+.v22-simple .scan-action-icon{font-size:22px}.v22-simple .scan-action span:last-child{display:flex;flex-direction:column;gap:3px}.v22-simple .scan-action b{font-size:13px}.v22-simple .scan-action small{font-size:10px;opacity:.65}
+.v22-simple .file-count{font-size:11px;color:var(--muted);margin-top:10px;min-height:15px}
+.v22-simple .scan-progress-card{margin-top:14px;padding:14px;border-radius:18px;background:#f7f7fb;border:1px solid #ebeaf2}
+.v22-simple .scan-progress-card[hidden]{display:none!important}
+.v22-simple .scan-progress-top{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px}.v22-simple .scan-progress-top>div{display:flex;flex-direction:column;gap:2px}.v22-simple .scan-progress-top b{font-size:12px}.v22-simple .scan-progress-top small{font-size:10px;color:var(--muted)}
+.v22-simple .scan-spinner{width:22px;height:22px;border:2.5px solid #d9d9e5;border-top-color:var(--navy);border-radius:50%;animation:scanSpin .8s linear infinite}.v22-simple .scan-progress-card.done .scan-spinner{animation:none;border:0}.v22-simple .scan-progress-card.done .scan-spinner:before{content:'✓';display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#dff5e9;color:#27845d;font-weight:900}.v22-simple .scan-progress-card.error .scan-spinner{animation:none;border:0}.v22-simple .scan-progress-card.error .scan-spinner:before{content:'!';display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffe8e8;color:#b94343;font-weight:900}
+.v22-simple .scan-count{font-size:11px;font-weight:800;color:var(--muted)}.v22-simple .scan-progress-track{height:7px;background:#e4e5ee;border-radius:999px;overflow:hidden;margin-top:12px}.v22-simple .scan-progress-track i{display:block;height:100%;width:8%;background:var(--navy);border-radius:999px;transition:width .35s ease}
+@keyframes scanSpin{to{transform:rotate(360deg)}}
+'''
+          if '@keyframes scanSpin' not in css: css += '\n' + extra
+          p.write_text(css)
+
+          # --- bump asset versions and SW cache ---
+          p=Path('index.html'); s=p.read_text(); s=s.replace('v22.css?v=220','v22.css?v=240').replace('v22.js?v=220','v22.js?v=240'); p.write_text(s)
+          p=Path('sw.js'); s=p.read_text(); s=re.sub(r"const CACHE = '[^']+';", "const CACHE = 'money-journal-v2-2.4-2026-09-12';", s, count=1); p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add v21.js v22.js v22.css index.html sw.js
+          git commit -m 'Fix batch scan and add visible progress UX [skip ci]' || exit 0
+          git push
