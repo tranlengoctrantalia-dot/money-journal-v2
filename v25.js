@@ -46,10 +46,10 @@
     root.querySelectorAll('.v25sel').forEach(el=>el.onchange=e=>rows[+e.target.dataset.i].selected=e.target.checked);
     root.querySelectorAll('.v25name').forEach(el=>el.onchange=e=>rows[+e.target.dataset.i].name=e.target.value);
     root.querySelectorAll('.v25amt').forEach(el=>el.onchange=e=>rows[+e.target.dataset.i].amount=Number(e.target.value));
-    $('v25Save').onclick=save;
+    $('v25Save').onclick=saveRows;
   }
 
-  function save(){const chosen=rows.filter(r=>r.selected&&r.amount);if(!chosen.length)return;try{if(typeof state==='undefined'||!Array.isArray(state.transactions))throw new Error('Không truy cập được dữ liệu');for(const r of chosen){state.transactions.unshift({id:Date.now()+Math.random(),name:r.name,amount:Number(r.amount),date:r.date,type:r.type,category:r.category,account:r.account,note:'Nhập từ sao kê'});}if(typeof save==='function')save();else localStorage.setItem('moneyJournalV2',JSON.stringify(state));if(typeof render==='function'){};if(typeof window.renderAll==='function')window.renderAll();$('v25Result').innerHTML=`<div class="scan-v25-saved">✓ Đã lưu ${chosen.length} giao dịch</div>`}catch(e){console.error(e);$('v25Result').innerHTML='<div class="scan-v25-error">Không lưu được. Thử lại.</div>'}}
+  function saveRows(){const chosen=rows.filter(r=>r.selected&&r.amount);if(!chosen.length)return;try{if(typeof state==='undefined'||!Array.isArray(state.transactions))throw new Error('Không truy cập được dữ liệu');for(const r of chosen){state.transactions.unshift({id:Date.now()+Math.random(),name:r.name,amount:Number(r.amount),date:r.date,type:r.type,category:r.category,account:r.account,note:'Nhập từ sao kê'});}if(typeof save==='function')save();else localStorage.setItem('moneyJournalV2',JSON.stringify(state));if(typeof render==='function'){};if(typeof window.renderAll==='function')window.renderAll();$('v25Result').innerHTML=`<div class="scan-v25-saved">✓ Đã lưu ${chosen.length} giao dịch</div>`}catch(e){console.error(e);$('v25Result').innerHTML='<div class="scan-v25-error">Không lưu được. Thử lại.</div>'}}
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(mount,1200));else setTimeout(mount,1200);
 })();
