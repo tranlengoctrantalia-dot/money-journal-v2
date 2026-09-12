@@ -42,67 +42,121 @@
     const scan = document.querySelector('#scan .scan-box, #scan .scan');
     if(!scan) return;
     scan.innerHTML = `
-      <div class="cam">🧾</div>
-      <div class="simple-scan-title">Nhập sao kê</div>
-      <div class="simple-scan-sub">Chọn tối đa 10 ảnh hoặc 1 file PDF.</div>
+      <div class="scan-hero-icon">🧾</div>
+      <div class="simple-scan-title">Quét sao kê</div>
+      <div class="simple-scan-sub">Chọn ảnh. App tự đọc và tạo giao dịch.</div>
       <input id="statementPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
       <input id="statementPdf" type="file" accept="application/pdf" hidden>
       <input id="statementFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" hidden>
       <select id="statementSource" hidden><option value="auto" selected>Tự nhận diện</option><option value="vpbank">VPBank</option><option value="shinhan">Shinhan</option><option value="paylater">Ví Trả Sau</option><option value="other">Khác</option></select>
       <input id="statementAccount" hidden>
-      <div class="simple-upload">
-        <button class="btn" id="pickPhotoBtn">🖼️ Chọn ảnh</button>
-        <button class="btn secondary-upload" id="pickPdfBtn">📄 Chọn PDF</button>
+      <div class="scan-actions">
+        <button class="scan-action primary" id="pickPhotoBtn"><span class="scan-action-icon">🖼️</span><span><b>Chọn ảnh</b><small>Tối đa 10 ảnh</small></span></button>
+        <button class="scan-action" id="pickPdfBtn"><span class="scan-action-icon">📄</span><span><b>Chọn PDF</b><small>1 file</small></span></button>
       </div>
-      <div id="photoCount" class="file-count">Chưa chọn ảnh</div>
-      <details class="scan-options">
-        <summary>Tuỳ chọn</summary>
-        <div class="provider-row">
-          <div><label>Ngân hàng / ví</label><select id="statementSourceVisible"><option value="auto">Tự nhận diện</option><option value="vpbank">VPBank</option><option value="shinhan">Shinhan</option><option value="paylater">Ví Trả Sau</option><option value="other">Khác</option></select></div>
-          <div><label>Tài khoản</label><input id="statementAccountVisible" placeholder="VD: Shinhan Credit"></div>
+      <div id="photoCount" class="file-count"></div>
+      <div id="scanProgress" class="scan-progress-card" hidden>
+        <div class="scan-progress-top">
+          <span class="scan-spinner"></span>
+          <div><b id="scanProgressTitle">Đang quét…</b><small id="scanProgressSub">Vui lòng giữ app mở</small></div>
+          <span id="scanProgressCount" class="scan-count"></span>
         </div>
-      </details>`;
+        <div class="scan-progress-track"><i id="scanProgressBar"></i></div>
+      </div>`;
 
     const photo=byId('statementPhoto'), pdf=byId('statementPdf');
     byId('pickPhotoBtn').onclick = () => photo.click();
     byId('pickPdfBtn').onclick = () => pdf.click();
+
     photo.onchange = async () => {
       const selected = Array.from(photo.files || []);
       const files = selected.slice(0,10);
-      byId('photoCount').textContent = selected.length > 10 ? `Đã chọn ${files.length}/10 ảnh • bỏ qua ${selected.length-10} ảnh` : `Đã chọn ${files.length}/10 ảnh`;
+      const count=byId('photoCount');
+      if(count) count.textContent = selected.length > 10 ? `Đã chọn 10 ảnh · bỏ qua ${selected.length-10}` : files.length ? `Đã chọn ${files.length} ảnh` : '';
       if(files.length) await scanStatementBatch(files);
       photo.value='';
     };
+
     pdf.onchange = async () => {
       const file=pdf.files?.[0];
-      if(file && typeof window.scanStatement==='function') await window.scanStatement(file);
+      if(!file) return;
+      showScanProgress(0,1,'Đang đọc PDF…','Có thể mất một lúc');
+      try{
+        if(typeof window.scanStatement==='function') await window.scanStatement(file);
+        finishScanProgress('Đã đọc PDF');
+      }catch(e){
+        console.error(e); failScanProgress('Không đọc được PDF');
+      }
       pdf.value='';
     };
-    byId('statementSourceVisible').onchange = e => byId('statementSource').value=e.target.value;
-    byId('statementAccountVisible').oninput = e => byId('statementAccount').value=e.target.value;
+  }
+
+  function showScanProgress(done,total,title,sub){
+    const box=byId('scanProgress'); if(!box) return;
+    box.hidden=false; box.classList.remove('done','error'); box.classList.add('busy');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub'), c=byId('scanProgressCount'), b=byId('scanProgressBar');
+    if(t) t.textContent=title||'Đang quét…';
+    if(st) st.textContent=sub||'Vui lòng giữ app mở';
+    if(c) c.textContent=total?`${Math.min(done,total)}/${total}`:'';
+    if(b) b.style.width=(total?Math.max(6,Math.round(done/total*100)):8)+'%';
+  }
+
+  function finishScanProgress(text){
+    const box=byId('scanProgress'); if(!box) return;
+    box.classList.remove('busy','error'); box.classList.add('done');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub'), b=byId('scanProgressBar'), c=byId('scanProgressCount');
+    if(t) t.textContent=text||'Quét xong';
+    if(st) st.textContent='Kiểm tra giao dịch bên dưới';
+    if(b) b.style.width='100%';
+    if(c) c.textContent='✓';
+  }
+
+  function failScanProgress(text){
+    const box=byId('scanProgress'); if(!box) return;
+    box.classList.remove('busy','done'); box.classList.add('error');
+    const t=byId('scanProgressTitle'), st=byId('scanProgressSub');
+    if(t) t.textContent=text||'Có lỗi';
+    if(st) st.textContent='Thử lại với ảnh rõ hơn';
   }
 
   async function scanStatementBatch(files){
-    if(typeof window.scanStatement !== 'function') return;
-    const all=[]; const seen=new Set();
-    const status=byId('ocrStatus');
-    for(let i=0;i<files.length;i++){
-      if(status) status.textContent=`Đang đọc ảnh ${i+1}/${files.length}…`;
-      await window.scanStatement(files[i]);
-      const rows=(getRows()||[]).map(r=>({...r}));
-      for(const r of rows){
-        const k=rowKey(r);
-        if(seen.has(k)) continue;
-        seen.add(k); all.push(r);
+    if(typeof window.scanStatement !== 'function') { failScanProgress('Chưa sẵn sàng để quét'); return; }
+    const all=[]; const seen=new Set(); const status=byId('ocrStatus');
+    const photoBtn=byId('pickPhotoBtn'), pdfBtn=byId('pickPdfBtn');
+    if(photoBtn) photoBtn.disabled=true;
+    if(pdfBtn) pdfBtn.disabled=true;
+    showScanProgress(0,files.length,`Đang quét ${files.length} ảnh…`,'Ảnh đầu tiên thường chậm hơn');
+
+    try{
+      for(let i=0;i<files.length;i++){
+        showScanProgress(i,files.length,`Đang quét ảnh ${i+1}/${files.length}`,'Đang nhận diện giao dịch');
+        if(status) status.textContent=`Đang quét ảnh ${i+1}/${files.length}…`;
+        await window.scanStatement(files[i]);
+        const rows=(getRows()||[]).map(r=>({...r}));
+        for(const r of rows){
+          const k=rowKey(r);
+          if(seen.has(k)) continue;
+          seen.add(k); all.push(r);
+        }
+        showScanProgress(i+1,files.length,i+1===files.length?'Đang hoàn tất…':`Đã xong ảnh ${i+1}/${files.length}`,'Tiếp tục tự động');
       }
+
+      setRows(all);
+      if(typeof window.renderCandidates==='function') window.renderCandidates();
+      if(typeof window.updateReviewSummary==='function') window.updateReviewSummary();
+      if(byId('reviewTools')) byId('reviewTools').style.display=all.length?'flex':'none';
+      if(byId('reviewSummary')) byId('reviewSummary').style.display=all.length?'grid':'none';
+      if(byId('saveCandidatesWrap')) byId('saveCandidatesWrap').style.display=all.length?'block':'none';
+      if(status) status.textContent=all.length?`Tìm thấy ${all.length} giao dịch.`:'Không tìm thấy giao dịch.';
+      finishScanProgress(all.length?`Xong · ${all.length} giao dịch`:'Không tìm thấy giao dịch');
+    }catch(e){
+      console.error(e);
+      failScanProgress('Quét bị gián đoạn');
+      if(status) status.textContent='Quét bị gián đoạn. Thử lại.';
+    }finally{
+      if(photoBtn) photoBtn.disabled=false;
+      if(pdfBtn) pdfBtn.disabled=false;
     }
-    setRows(all);
-    if(typeof window.renderCandidates==='function') window.renderCandidates();
-    if(typeof window.updateReviewSummary==='function') window.updateReviewSummary();
-    if(byId('reviewTools')) byId('reviewTools').style.display=all.length?'flex':'none';
-    if(byId('reviewSummary')) byId('reviewSummary').style.display=all.length?'grid':'none';
-    if(byId('saveCandidatesWrap')) byId('saveCandidatesWrap').style.display=all.length?'block':'none';
-    if(status) status.textContent=all.length?`Đã đọc ${files.length} ảnh • ${all.length} giao dịch chờ kiểm tra.`:'Chưa đọc được giao dịch. Thử ảnh rõ hơn.';
   }
   window.scanStatementBatch = scanStatementBatch;
 
@@ -115,7 +169,7 @@
           <input type="checkbox" ${r.selected?'checked':''} onchange="ocrRows[${i}].selected=this.checked;updateReviewSummary()">
           <span class="candidate-type">${labels[r.type]||'Giao dịch'}</span>
           ${r.duplicate?'<span class="confidence dupe">Có thể trùng</span>':''}
-          ${r.confidence<60?`<span class="confidence low">Cần kiểm tra</span>`:''}
+          ${r.confidence<60?'<span class="confidence low">Cần kiểm tra</span>':''}
         </div>
         <div class="candidate-main">
           <input type="text" value="${esc(r.name)}" placeholder="Nội dung" onchange="ocrRows[${i}].name=this.value">
@@ -131,6 +185,7 @@
         </div></details>
       </div>`).join('');
     };
+
     window.updateReviewSummary = function(){
       const root=byId('reviewSummary'); if(!root) return;
       const rows=getRows().filter(r=>r.selected);
