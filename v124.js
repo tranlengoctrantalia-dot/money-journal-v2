@@ -12,7 +12,6 @@ const SEED=[
   {id:'p_202608_dating',month:'2026-08',kind:'due',label:'Phần partner chi hẹn hò tháng 8',amount:2554348,note:'2/3 × 3.831.522đ chi hẹn hò đã confirm'},
   {id:'p_202608_buyfor',month:'2026-08',kind:'due',label:'Mua giùm partner tháng 8',amount:344209,note:'TikTok Shop 159.297đ + Shopee 184.912đ'},
   {id:'p_202608_bday',month:'2026-08',kind:'due',label:'Quà sinh nhật',amount:1000000,note:'Khoản partner cần hoàn thêm tháng 8'},
-  {id:'p_202608_paid',month:'2026-08',kind:'paid',label:'Partner đã chuyển',amount:3000000,note:'Tiền hẹn hò/hoàn trả đã nhận'},
   {id:'p_202609_dating',month:'2026-09',kind:'due',label:'Phần partner chi hẹn hò tháng 9',amount:374400,note:'Tạm tính 2/3 × 561.600đ Kimgane'},
   {id:'p_202609_buyfor',month:'2026-09',kind:'due',label:'Mua giùm partner tháng 9',amount:255200,note:'Shopee 08/09 đã confirm mua giùm partner'}
 ];
@@ -20,6 +19,8 @@ const SEED=[
 function migrate(){
   const s=load();
   s.partnerLedger=Array.isArray(s.partnerLedger)?s.partnerLedger:[];
+  // Correction 13/09/2026: partner has NOT transferred 3,000,000đ yet.
+  s.partnerLedger=s.partnerLedger.filter(x=>x.id!=='p_202608_paid');
   SEED.forEach(x=>{
     const i=s.partnerLedger.findIndex(y=>y.id===x.id);
     if(i<0)s.partnerLedger.push(x);
@@ -47,7 +48,7 @@ function monthBlock(month){
 function panel(){
   const aug=calcMonth('2026-08'),sep=calcMonth('2026-09');
   const total=aug.remain+sep.remain;
-  return `<section class="panel partner-panel" id="partnerPanel"><div class="partner-title"><div><small>ĐỐI SOÁT PARTNER</small><h2>Partner cần hoàn</h2></div><strong>${fmt(total)}đ</strong></div><div class="partner-summary"><div><small>Tháng 8 còn</small><b>${fmt(aug.remain)}đ</b></div><div><small>Tháng 9 tạm tính</small><b>${fmt(sep.remain)}đ</b></div></div>${monthBlock('2026-08')}${monthBlock('2026-09')}<p class="partner-note">Tháng 8 đã gồm quà sinh nhật 1.000.000đ. Tháng 9 phần hẹn hò đang tạm tính theo tỷ lệ partner 2/3.</p></section>`;
+  return `<section class="panel partner-panel" id="partnerPanel"><div class="partner-title"><div><small>ĐỐI SOÁT PARTNER</small><h2>Partner cần hoàn</h2></div><strong>${fmt(total)}đ</strong></div><div class="partner-summary"><div><small>Tháng 8 còn</small><b>${fmt(aug.remain)}đ</b></div><div><small>Tháng 9 tạm tính</small><b>${fmt(sep.remain)}đ</b></div></div>${monthBlock('2026-08')}${monthBlock('2026-09')}<p class="partner-note">Chưa ghi nhận khoản partner nào đã chuyển. Tháng 8 đã gồm quà sinh nhật 1.000.000đ. Tháng 9 phần hẹn hò đang tạm tính theo tỷ lệ partner 2/3.</p></section>`;
 }
 function inject(){
   const screen=document.querySelector('#screen');
