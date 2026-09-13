@@ -1,0 +1,37 @@
+/* V4.5 — simplify home + polish add flow */
+:root{--v45-choice-bg:color-mix(in srgb,var(--m-gold) 10%,var(--m-surface));--v45-choice-line:color-mix(in srgb,var(--m-gold) 38%,var(--m-line));}
+
+/* Home: the hero already explains this month. Remove the duplicated monthly-analysis block. */
+.v45-home-monthly-hidden{display:none!important}
+
+/* A calmer page rhythm */
+.v44-section-head{margin-top:28px}
+#v44-home .v44-section-head:first-of-type{margin-top:24px}
+
+/* Add sheet — stronger hierarchy and readable text in both themes */
+.v45-add-sheet{padding-top:12px!important}
+.v45-add-sheet:before{content:"";display:block;width:42px;height:5px;border-radius:999px;background:var(--m-line);margin:0 auto 16px}
+.v45-add-title{margin:0 0 4px;font-size:22px;font-weight:900;letter-spacing:-.04em;color:var(--m-ink)}
+.v45-add-sub{margin:0 0 16px;font-size:11px;line-height:1.45;color:var(--m-muted)}
+.v45-add-sheet .v44-choice{background:var(--v45-choice-bg)!important;border-color:var(--v45-choice-line)!important;color:var(--m-ink)!important;padding:16px!important;border-radius:18px!important;box-shadow:none!important}
+.v45-add-sheet .v44-choice b{font-size:14px!important;font-weight:900!important;color:var(--m-ink)!important;letter-spacing:-.015em}
+.v45-add-sheet .v44-choice small{font-size:11px!important;line-height:1.4!important;color:var(--m-muted)!important;margin-top:5px!important}
+.v45-add-sheet .v44-choice:active{transform:scale(.985);background:color-mix(in srgb,var(--m-gold) 16%,var(--m-surface))!important}
+.v45-add-sheet .v44-primary{background:linear-gradient(135deg,var(--m-gold2),var(--m-gold))!important;color:#17120a!important;font-weight:900!important}
+.v45-add-sheet .v44-secondary{color:var(--m-ink)!important;background:var(--m-surface2)!important}
+
+/* Inputs in add/edit sheets should never inherit washed-out text */
+.v44-sheet input,.v44-sheet select,.v44-sheet textarea{color:var(--m-ink)!important;background:var(--m-surface2)!important;border-color:var(--m-line)!important}
+.v44-sheet input::placeholder,.v44-sheet textarea::placeholder{color:var(--m-muted)!important;opacity:.8}
+
+/* Dòng tiền: period is context, not another analysis card */
+.v45-period{display:inline-flex;align-items:center;gap:6px;margin:2px 0 14px;padding:7px 10px;border-radius:999px;background:var(--m-surface2);border:1px solid var(--m-line);color:var(--m-muted);font-size:10px;font-weight:850}
+.v45-period:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--m-gold)}
+
+/* Slightly cleaner category and transaction surfaces */
+.v44-cat-summary .v44-cat-row{padding:13px 0}
+.v44-card .v44-tx{padding:15px 0}
+
+html[data-theme="dark"] .v45-add-sheet .v44-choice{background:rgba(239,189,81,.08)!important;border-color:rgba(239,189,81,.24)!important}
+html[data-theme="dark"] .v45-add-sheet .v44-choice b{color:#f7f2e8!important}
+html[data-theme="dark"] .v45-add-sheet .v44-choice small{color:#aab3c6!important}
