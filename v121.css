@@ -1,0 +1,13 @@
+/* V12.1 readability + asset reconciliation pass */
+html,body{font-size:16px}
+.brand b{font-size:22px}
+.hero-label{font-size:12px}.hero-amount{font-size:39px}.hero-delta{font-size:12px}.hero-stat small{font-size:10px}.hero-stat b{font-size:13px}
+.section-head{margin-top:22px}.section-head h2{font-size:18px}.section-head button,.section-head span{font-size:12px}
+.asset-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.asset-card{padding:12px;border-radius:18px;display:grid;grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;row-gap:8px;align-items:center;min-width:0}.asset-icon{grid-column:1;grid-row:1;width:30px;height:30px;border-radius:10px}.asset-icon svg{width:16px;height:16px}.asset-card small{grid-column:2;grid-row:1;margin:0;font-size:12px;line-height:1.15;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.asset-card b{grid-column:1/-1;grid-row:2;margin:0;font-size:20px;line-height:1.05;letter-spacing:-.04em;white-space:nowrap}.asset-icon.bank-live{background:#e7f1ff;color:#315d9f}.asset-icon.save-live{background:#eee9ff;color:#6550bd}
+.category-panel{padding:16px}.donut-center small{font-size:10px}.donut-center b{font-size:15px}.legend-row b,.legend-row span{font-size:11px}.up-row b{font-size:13px}.up-row small{font-size:11px}.up-row strong{font-size:13px}
+.page-head h1{font-size:29px}.seg button{font-size:12px}.search{font-size:13px}.summary-title{font-size:12px}.summary-grid small{font-size:10px}.summary-grid b{font-size:18px}.day-head b{font-size:13px}.day-head span{font-size:12px}
+.tx{grid-template-columns:40px minmax(0,1fr) auto;padding:12px}.tx-main b{font-size:13px}.tx-main small{font-size:10.5px}.tx-right b{font-size:12px}.tx-right small{font-size:10px}
+.add-title h1{font-size:26px}.type-toggle button{font-size:12px}.cat-choice span{font-size:10px}.field label{font-size:11px}.input-row input,.input-row select{font-size:13px}.amount-input{font-size:30px!important}.attach-btn{font-size:11px}.attach-note{font-size:10px}.save-btn{font-size:13px}
+.budget-meta small{font-size:10px}.budget-meta b{font-size:13px}.goal-card b{font-size:13px}.goal-card small{font-size:10px}.setting b{font-size:12px}.setting small{font-size:10px}.setting button{font-size:11px}
+.bottom-nav button{font-size:9.5px}.bottom-nav svg{width:18px;height:18px}.bottom-nav .add small{font-size:9px}
+@media(max-width:390px){.asset-card{grid-template-columns:28px minmax(0,1fr);padding:10px;column-gap:6px}.asset-icon{width:28px;height:28px}.asset-card small{font-size:11px}.asset-card b{font-size:17px}.hero-amount{font-size:37px}.section-head h2{font-size:17px}}
