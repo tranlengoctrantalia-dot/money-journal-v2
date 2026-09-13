@@ -1,5 +1,5 @@
-const CACHE = 'money-journal-v2-4.4.0-2026-09-12';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v22.css', './v44-rebuild.css', './v44-rebuild.js'];
+const CACHE = 'money-journal-v2-4.5.0-2026-09-13';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './v21.css', './v22.css', './v44-rebuild.css', './v44-rebuild.js', './v45-polish.css', './v45-polish.js'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
@@ -16,8 +16,10 @@ async function enhanceHtml(response) {
   if (!type.includes('text/html')) return response;
   let html = await response.text();
   if (!html.includes('mj_theme_mode')) html = html.replace('<head>', '<head><script>(function(){try{var t=localStorage.getItem("mj_theme_mode")==="dark"?"dark":"light";document.documentElement.setAttribute("data-theme",t);document.documentElement.style.colorScheme=t}catch(e){}})();</script>');
-  if (!html.includes('v44-rebuild.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v44-rebuild.css?v=440"></head>');
-  if (!html.includes('v44-rebuild.js')) html = html.replace('</body>', '<script src="./v44-rebuild.js?v=440" defer></script></body>');
+  if (!html.includes('v44-rebuild.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v44-rebuild.css?v=450"></head>');
+  if (!html.includes('v45-polish.css')) html = html.replace('</head>', '<link rel="stylesheet" href="./v45-polish.css?v=450"></head>');
+  if (!html.includes('v44-rebuild.js')) html = html.replace('</body>', '<script src="./v44-rebuild.js?v=450" defer></script></body>');
+  if (!html.includes('v45-polish.js')) html = html.replace('</body>', '<script src="./v45-polish.js?v=450" defer></script></body>');
   const headers = new Headers(response.headers);
   headers.set('content-type', 'text/html; charset=utf-8');
   headers.set('cache-control', 'no-store');
