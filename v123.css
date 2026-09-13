@@ -1,0 +1,13 @@
+/* V12.3 compact assets + truthful donut */
+/* Asset cards should support the page, not dominate it */
+.asset-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.asset-card{min-height:76px!important;padding:9px 10px!important;border-radius:15px!important;grid-template-columns:26px minmax(0,1fr)!important;grid-template-rows:26px auto!important;gap:6px 6px!important;box-shadow:0 7px 22px rgba(20,33,61,.045)!important}
+.asset-card .asset-icon{width:26px!important;height:26px!important;border-radius:8px!important}
+.asset-card .asset-icon svg{width:14px!important;height:14px!important}
+.asset-card small{font-size:11.5px!important;font-weight:750!important;line-height:1.1!important}
+.asset-card b{font-size:17px!important;line-height:1.05!important;letter-spacing:-.035em!important}
+
+/* Category block: compact and internally consistent */
+.category-panel{padding:13px 14px!important}.cat-wrap{grid-template-columns:108px minmax(0,1fr)!important;gap:12px!important}.donut{width:102px!important;height:102px!important}.donut:after{width:64px!important;height:64px!important}.donut-center small{font-size:10px!important}.donut-center b{font-size:14px!important}.legend{gap:7px!important}.legend-row{grid-template-columns:8px max-content max-content!important;column-gap:6px!important}.legend-dot{width:8px!important;height:8px!important}.legend-row b{font-size:12px!important}.legend-row span{font-size:11px!important;padding:1px 5px!important}
+
+@media(max-width:390px){.asset-card{min-height:70px!important;padding:8px!important;grid-template-columns:24px minmax(0,1fr)!important;grid-template-rows:24px auto!important}.asset-card .asset-icon{width:24px!important;height:24px!important}.asset-card small{font-size:10.5px!important}.asset-card b{font-size:15px!important}.cat-wrap{grid-template-columns:96px minmax(0,1fr)!important;gap:9px!important}.donut{width:92px!important;height:92px!important}.donut:after{width:58px!important;height:58px!important}.legend-row b{font-size:11px!important}.legend-row span{font-size:10.5px!important}}
